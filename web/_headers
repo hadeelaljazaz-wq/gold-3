@@ -1,0 +1,38 @@
+# Security Headers
+/*
+  X-Frame-Options: DENY
+  X-XSS-Protection: 1; mode=block
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer-when-downgrade
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+
+# Cache Control for Static Assets
+/icons/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/favicon.png
+  Cache-Control: public, max-age=31536000, immutable
+
+# APK File Headers
+/*.apk
+  Content-Type: application/vnd.android.package-archive
+  Content-Disposition: attachment
+  Cache-Control: public, max-age=86400
+
+# HTML Files - No cache for updates
+/*.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+# Main index.html - Force refresh
+/index.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+# JSON Files
+/*.json
+  Content-Type: application/json
+  Cache-Control: public, max-age=3600
+

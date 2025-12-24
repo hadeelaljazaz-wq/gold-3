@@ -1,0 +1,64 @@
+name: Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release_android:
+    name: Build and Release Android
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+      
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+      
+      - name: Get dependencies
+        run: flutter pub get
+      
+      - name: Run tests
+        run: |
+          flutter test test/unit/
+          flutter test test/widget/
+      
+      - name: Build APK
+        run: flutter build apk --release
+      
+      - name: Build App Bundle
+        run: flutter build appbundle --release
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/bundle/release/app-release.aab
+          body: |
+            ## Gold Nightmare Pro Release
+            
+            ### Features
+            - Advanced Gold Trading Analysis
+            - Scalping & Swing Trading Engines
+            - Golden Nightmare Engine
+            - Real-time Market Data
+            - AI-Powered Recommendations
+            
+            ### Installation
+            Download the APK and install on your Android device.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+

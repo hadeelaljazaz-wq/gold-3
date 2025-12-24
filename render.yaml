@@ -1,0 +1,45 @@
+# Render Blueprint for Gold Nightmare Pro
+# This file configures automatic deployment on Render
+
+services:
+  - type: web
+    name: gold-nightmare-pro
+    env: static
+    buildCommand: chmod +x render-build.sh && ./render-build.sh
+    staticPublishPath: build/web
+    
+    # Environment variables (set these in Render Dashboard)
+    envVars:
+      - key: GOLD_PRICE_API_KEY
+        sync: false  # Must be set manually in Render Dashboard
+      - key: GOLD_PRICE_BASE_URL
+        value: https://www.goldapi.io/api
+      - key: ANTHROPIC_API_KEY
+        sync: false  # Optional: set manually if using Claude AI
+      - key: TWELVE_DATA_API_KEY
+        sync: false  # Optional: alternative gold price API
+    
+    # Auto-deploy on git push
+    autoDeploy: true
+    
+    # Headers for security and caching
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=3600
+      - path: /assets/*
+        name: Cache-Control
+        value: public, max-age=31536000
+      - path: /*
+        name: X-Frame-Options
+        value: SAMEORIGIN
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+    
+    # Routes for SPA
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+

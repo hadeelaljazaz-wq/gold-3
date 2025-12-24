@@ -1,0 +1,8 @@
+# Netlify Redirects Configuration
+
+# Force HTTPS
+http://* https://:splat 301!
+
+# SPA fallback - Flutter web app
+/*    /index.html   200
+

@@ -1,0 +1,12 @@
+# Netlify
+.netlify/
+
+# Build files
+*.log
+.DS_Store
+Thumbs.db
+
+# Keep APK file
+!*.apk
+
+

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Allow: /download.html
+Disallow: /*.apk$
+
+Sitemap: https://skalp-al-kabous.netlify.app/sitemap.xml
+
+

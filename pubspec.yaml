@@ -1,0 +1,141 @@
+name: golden_nightmare_pro
+description: Professional Gold Trading Analysis Platform powered by AI
+publish_to: 'none'
+version: 3.1.1+32
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  
+  # State Management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+  
+  # Navigation
+  go_router: ^14.2.0
+  
+  # API & Network
+  dio: ^5.4.3
+  retrofit: ^4.1.0
+  pretty_dio_logger: ^1.3.1
+  
+  # Storage & Device Info
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  device_info_plus: ^9.0.0
+  shared_preferences: ^2.2.0
+  
+  # CSV
+  csv: ^6.0.0
+  
+  # Charts
+  fl_chart: ^0.68.0
+  syncfusion_flutter_charts: ^31.2.16
+  
+  # WebView (TradingView)
+  webview_flutter: ^4.8.0
+  
+  # UI/UX
+  animate_do: ^3.3.4
+  shimmer: ^3.0.0
+  lottie: ^3.1.2
+  cached_network_image: ^3.3.1
+  flutter_animate: ^4.5.0
+  google_fonts: ^6.2.1
+  
+  # Environment Variables
+  flutter_dotenv: ^5.1.0
+  
+  # Utils
+  intl: ^0.20.0
+  freezed_annotation: ^2.4.1
+  json_annotation: ^4.9.0
+  path_provider: ^2.1.3
+  url_launcher: ^6.3.0
+  share_plus: ^9.0.0
+  
+  # License System
+  crypto: ^3.0.3
+  
+  # ML/AI
+  # tflite_flutter: ^0.10.4  # مشكلة في النسخة القديمة
+  # سيتم استخدام fallback mode فقط حالياً
+  
+  # Notifications
+  flutter_local_notifications: ^17.0.0
+  firebase_messaging: ^14.7.0
+  
+  # Connectivity
+  connectivity_plus: ^5.0.0
+  
+  # UUID
+  uuid: ^4.3.3
+  
+  # Icons
+  font_awesome_flutter: ^10.7.0
+  cupertino_icons: ^1.0.8
+  
+  # Splash - REMOVED to fix freeze issue
+  # flutter_native_splash: ^2.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  
+  # Code Generation
+  build_runner: ^2.4.9
+  freezed: ^2.5.2
+  json_serializable: ^6.8.0
+  riverpod_generator: ^2.4.0
+  retrofit_generator: ^8.1.0
+  hive_generator: ^2.0.1
+  
+  # Linting
+  flutter_lints: ^4.0.0
+  
+  # Launcher Icons
+  flutter_launcher_icons: ^0.13.1
+
+# App Icon Configuration
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/app_icon.png"
+  min_sdk_android: 21
+  # Disable adaptive icons to show full image without cropping
+  remove_alpha_ios: true
+
+# Splash Screen Configuration - DISABLED to fix freeze
+# flutter_native_splash:
+#   color: "#0A0E1A"
+#   image: assets/images/splash.png
+#   android: true
+#   ios: true
+#   android_12:
+#     image: assets/images/splash.png
+#     color: "#0A0E1A"
+
+flutter:
+  uses-material-design: true
+  
+  assets:
+    - assets/images/
+    - assets/translations/
+    - assets/historical_data/
+    - assets/lottie/
+    # Unified activation codes file (NEW - replaces all old files)
+    - assets/activation_codes/all_valid_codes.json
+    - project.env
+    # Real market data CSV files - ALL TIMEFRAMES
+    - assets/XAUUSDm5.csv
+    - assets/XAUUSDm15.csv
+    - assets/XAUUSDm60.csv
+    - assets/XAUUSDm240.csv
+    - assets/XAUUSDm1440.csv
+    # ML Models
+    - assets/models/

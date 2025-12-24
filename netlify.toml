@@ -1,0 +1,54 @@
+# Netlify Configuration for Gold Nightmare Pro
+# Optimized for iPhone compatibility
+
+[build]
+  command = "echo 'Using pre-built files'"
+  publish = "build/web"
+
+# Environment variables (configure in Netlify Dashboard)
+# GOLD_PRICE_API_KEY = your-goldapi-key
+# ANTHROPIC_API_KEY = your-anthropic-key
+
+# Headers for PWA and iOS optimization
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Redirects for SPA (Single Page Application)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# iOS PWA optimization
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/flutter_service_worker.js"
+  [headers.values]
+    Content-Type = "application/javascript"
+    Cache-Control = "public, max-age=0, must-revalidate"
