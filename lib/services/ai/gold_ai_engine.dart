@@ -11,9 +11,8 @@ class GoldAIEngine {
   GoldAIEngine._internal();
 
   // Performance tracking
-  final List<_PredictionRecord> _predictionHistory = [];
   double _modelAccuracy = 0.72; // Initial accuracy estimate
-  
+
   // Model weights (learned from performance)
   double _trendWeight = 0.30;
   double _momentumWeight = 0.25;
@@ -36,13 +35,13 @@ class GoldAIEngine {
 
     // 1. Feature Extraction - استخراج المميزات
     final features = _extractFeatures(candles, currentPrice);
-    
+
     // 2. Run Multiple Models - تشغيل نماذج متعددة
     final trendPrediction = _runTrendModel(features);
     final momentumPrediction = _runMomentumModel(features);
     final patternPrediction = _runPatternModel(candles, currentPrice);
     final volatilityPrediction = _runVolatilityModel(features);
-    
+
     // 3. Ensemble Fusion - دمج النماذج
     final ensembleResult = _ensembleFusion(
       trend: trendPrediction,
@@ -52,7 +51,7 @@ class GoldAIEngine {
       newsImpact: newsImpact ?? 0.0,
       sentiment: marketSentiment ?? 0.5,
     );
-    
+
     // 4. Generate Price Predictions - توليد تنبؤات الأسعار
     final predictions = _generatePricePredictions(
       currentPrice: currentPrice,
@@ -60,14 +59,14 @@ class GoldAIEngine {
       strength: ensembleResult.strength,
       volatility: volatilityPrediction.volatility,
     );
-    
+
     // 5. Calculate Confidence - حساب الثقة
     final confidence = _calculateConfidence(
       features: features,
       ensembleResult: ensembleResult,
       candles: candles,
     );
-    
+
     // 6. Generate Recommendations - توليد التوصيات
     final recommendations = _generateActiveRecommendations(
       currentPrice: currentPrice,
@@ -77,13 +76,14 @@ class GoldAIEngine {
       confidence: confidence,
       features: features,
     );
-    
+
     // 7. Identify Support/Resistance - تحديد الدعم والمقاومة
     final levels = _calculateSmartLevels(candles, currentPrice, predictions);
 
     print('🧠 AI Engine: Prediction complete!');
     print('   Direction: ${ensembleResult.direction}');
-    print('   Strength: ${(ensembleResult.strength * 100).toStringAsFixed(1)}%');
+    print(
+        '   Strength: ${(ensembleResult.strength * 100).toStringAsFixed(1)}%');
     print('   Confidence: ${(confidence.overall * 100).toStringAsFixed(1)}%');
 
     return AIGoldPrediction(
@@ -113,7 +113,7 @@ class GoldAIEngine {
       currentPrice: currentPrice,
       priceChange24h: _calculatePriceChange(closes, 24),
       priceChange7d: _calculatePriceChange(closes, 168),
-      
+
       // Moving averages
       sma20: _calculateSMA(closes, 20),
       sma50: _calculateSMA(closes, 50),
@@ -121,7 +121,7 @@ class GoldAIEngine {
       sma200: _calculateSMA(closes, 200),
       ema12: _calculateEMA(closes, 12),
       ema26: _calculateEMA(closes, 26),
-      
+
       // Momentum indicators
       rsi: _calculateRSI(closes, 14),
       macd: _calculateMACD(closes),
@@ -130,23 +130,23 @@ class GoldAIEngine {
       stochastic: _calculateStochastic(highs, lows, closes, 14),
       momentum: _calculateMomentum(closes, 10),
       roc: _calculateROC(closes, 12),
-      
+
       // Volatility indicators
       atr: _calculateATR(highs, lows, closes, 14),
       bollingerUpper: _calculateBollingerUpper(closes, 20),
       bollingerLower: _calculateBollingerLower(closes, 20),
       bollingerWidth: _calculateBollingerWidth(closes, 20),
-      
+
       // Trend indicators
       adx: _calculateADX(highs, lows, closes, 14),
       plusDI: _calculatePlusDI(highs, lows, closes, 14),
       minusDI: _calculateMinusDI(highs, lows, closes, 14),
-      
+
       // Volume indicators
       volumeSMA: _calculateSMA(volumes, 20),
       volumeRatio: volumes.last / _calculateSMA(volumes, 20),
       obv: _calculateOBV(closes, volumes),
-      
+
       // Price position
       pricePosition: _calculatePricePosition(currentPrice, highs, lows),
     );
@@ -156,27 +156,69 @@ class GoldAIEngine {
   _ModelPrediction _runTrendModel(_FeatureSet f) {
     double score = 0.0;
     int signals = 0;
-    
+
     // MA Cross signals
-    if (f.sma20 > f.sma50) { score += 1.5; signals++; }
-    if (f.sma50 > f.sma100) { score += 1.0; signals++; }
-    if (f.sma100 > f.sma200) { score += 0.5; signals++; }
-    if (f.sma20 < f.sma50) { score -= 1.5; signals++; }
-    if (f.sma50 < f.sma100) { score -= 1.0; signals++; }
-    if (f.sma100 < f.sma200) { score -= 0.5; signals++; }
-    
+    if (f.sma20 > f.sma50) {
+      score += 1.5;
+      signals++;
+    }
+    if (f.sma50 > f.sma100) {
+      score += 1.0;
+      signals++;
+    }
+    if (f.sma100 > f.sma200) {
+      score += 0.5;
+      signals++;
+    }
+    if (f.sma20 < f.sma50) {
+      score -= 1.5;
+      signals++;
+    }
+    if (f.sma50 < f.sma100) {
+      score -= 1.0;
+      signals++;
+    }
+    if (f.sma100 < f.sma200) {
+      score -= 0.5;
+      signals++;
+    }
+
     // EMA signals
-    if (f.ema12 > f.ema26) { score += 1.2; signals++; }
-    if (f.ema12 < f.ema26) { score -= 1.2; signals++; }
-    
+    if (f.ema12 > f.ema26) {
+      score += 1.2;
+      signals++;
+    }
+    if (f.ema12 < f.ema26) {
+      score -= 1.2;
+      signals++;
+    }
+
     // Price vs MAs
-    if (f.currentPrice > f.sma20) { score += 0.8; signals++; }
-    if (f.currentPrice > f.sma50) { score += 0.6; signals++; }
-    if (f.currentPrice > f.sma200) { score += 0.4; signals++; }
-    if (f.currentPrice < f.sma20) { score -= 0.8; signals++; }
-    if (f.currentPrice < f.sma50) { score -= 0.6; signals++; }
-    if (f.currentPrice < f.sma200) { score -= 0.4; signals++; }
-    
+    if (f.currentPrice > f.sma20) {
+      score += 0.8;
+      signals++;
+    }
+    if (f.currentPrice > f.sma50) {
+      score += 0.6;
+      signals++;
+    }
+    if (f.currentPrice > f.sma200) {
+      score += 0.4;
+      signals++;
+    }
+    if (f.currentPrice < f.sma20) {
+      score -= 0.8;
+      signals++;
+    }
+    if (f.currentPrice < f.sma50) {
+      score -= 0.6;
+      signals++;
+    }
+    if (f.currentPrice < f.sma200) {
+      score -= 0.4;
+      signals++;
+    }
+
     // ADX trend strength
     final trendStrength = f.adx / 100.0;
     if (f.plusDI > f.minusDI && f.adx > 25) {
@@ -187,13 +229,15 @@ class GoldAIEngine {
       score -= 1.5 * trendStrength;
       signals++;
     }
-    
+
     // Normalize score
     final normalizedScore = signals > 0 ? score / signals : 0.0;
-    final direction = normalizedScore > 0.3 ? 'BULLISH' 
-                    : normalizedScore < -0.3 ? 'BEARISH' 
-                    : 'NEUTRAL';
-    
+    final direction = normalizedScore > 0.3
+        ? 'BULLISH'
+        : normalizedScore < -0.3
+            ? 'BEARISH'
+            : 'NEUTRAL';
+
     return _ModelPrediction(
       direction: direction,
       score: normalizedScore.clamp(-1.0, 1.0),
@@ -205,38 +249,91 @@ class GoldAIEngine {
   _ModelPrediction _runMomentumModel(_FeatureSet f) {
     double score = 0.0;
     int signals = 0;
-    
+
     // RSI signals
-    if (f.rsi > 70) { score -= 1.5; signals++; } // Overbought
-    else if (f.rsi > 60) { score += 0.5; signals++; } // Bullish
-    else if (f.rsi > 50) { score += 0.3; signals++; } // Slightly bullish
-    else if (f.rsi > 40) { score -= 0.3; signals++; } // Slightly bearish
-    else if (f.rsi > 30) { score -= 0.5; signals++; } // Bearish
-    else { score += 1.5; signals++; } // Oversold
-    
+    if (f.rsi > 70) {
+      score -= 1.5;
+      signals++;
+    } // Overbought
+    else if (f.rsi > 60) {
+      score += 0.5;
+      signals++;
+    } // Bullish
+    else if (f.rsi > 50) {
+      score += 0.3;
+      signals++;
+    } // Slightly bullish
+    else if (f.rsi > 40) {
+      score -= 0.3;
+      signals++;
+    } // Slightly bearish
+    else if (f.rsi > 30) {
+      score -= 0.5;
+      signals++;
+    } // Bearish
+    else {
+      score += 1.5;
+      signals++;
+    } // Oversold
+
     // MACD signals
-    if (f.macd > f.macdSignal) { score += 1.2; signals++; }
-    if (f.macd < f.macdSignal) { score -= 1.2; signals++; }
-    if (f.macdHistogram > 0 && f.macdHistogram > f.macd * 0.1) { score += 0.5; signals++; }
-    if (f.macdHistogram < 0 && f.macdHistogram < f.macd * 0.1) { score -= 0.5; signals++; }
-    
+    if (f.macd > f.macdSignal) {
+      score += 1.2;
+      signals++;
+    }
+    if (f.macd < f.macdSignal) {
+      score -= 1.2;
+      signals++;
+    }
+    if (f.macdHistogram > 0 && f.macdHistogram > f.macd * 0.1) {
+      score += 0.5;
+      signals++;
+    }
+    if (f.macdHistogram < 0 && f.macdHistogram < f.macd * 0.1) {
+      score -= 0.5;
+      signals++;
+    }
+
     // Stochastic signals
-    if (f.stochastic > 80) { score -= 1.0; signals++; }
-    else if (f.stochastic < 20) { score += 1.0; signals++; }
-    else if (f.stochastic > 50) { score += 0.3; signals++; }
-    else { score -= 0.3; signals++; }
-    
+    if (f.stochastic > 80) {
+      score -= 1.0;
+      signals++;
+    } else if (f.stochastic < 20) {
+      score += 1.0;
+      signals++;
+    } else if (f.stochastic > 50) {
+      score += 0.3;
+      signals++;
+    } else {
+      score -= 0.3;
+      signals++;
+    }
+
     // Momentum & ROC
-    if (f.momentum > 0) { score += 0.5; signals++; }
-    if (f.momentum < 0) { score -= 0.5; signals++; }
-    if (f.roc > 2) { score += 0.8; signals++; }
-    if (f.roc < -2) { score -= 0.8; signals++; }
-    
+    if (f.momentum > 0) {
+      score += 0.5;
+      signals++;
+    }
+    if (f.momentum < 0) {
+      score -= 0.5;
+      signals++;
+    }
+    if (f.roc > 2) {
+      score += 0.8;
+      signals++;
+    }
+    if (f.roc < -2) {
+      score -= 0.8;
+      signals++;
+    }
+
     final normalizedScore = signals > 0 ? score / signals : 0.0;
-    final direction = normalizedScore > 0.2 ? 'BULLISH' 
-                    : normalizedScore < -0.2 ? 'BEARISH' 
-                    : 'NEUTRAL';
-    
+    final direction = normalizedScore > 0.2
+        ? 'BULLISH'
+        : normalizedScore < -0.2
+            ? 'BEARISH'
+            : 'NEUTRAL';
+
     return _ModelPrediction(
       direction: direction,
       score: normalizedScore.clamp(-1.0, 1.0),
@@ -248,36 +345,74 @@ class GoldAIEngine {
   _ModelPrediction _runPatternModel(List<Candle> candles, double currentPrice) {
     double score = 0.0;
     int patterns = 0;
-    
+
     final recent = candles.sublist(candles.length - 20);
-    
+
     // Candlestick patterns
     final lastCandle = recent.last;
     final prevCandle = recent[recent.length - 2];
-    
+
     // Bullish patterns
-    if (_isBullishEngulfing(prevCandle, lastCandle)) { score += 1.5; patterns++; }
-    if (_isHammer(lastCandle)) { score += 1.2; patterns++; }
-    if (_isMorningStar(recent)) { score += 1.8; patterns++; }
-    if (_isDoji(lastCandle) && _isDowntrend(recent)) { score += 0.8; patterns++; }
-    
+    if (_isBullishEngulfing(prevCandle, lastCandle)) {
+      score += 1.5;
+      patterns++;
+    }
+    if (_isHammer(lastCandle)) {
+      score += 1.2;
+      patterns++;
+    }
+    if (_isMorningStar(recent)) {
+      score += 1.8;
+      patterns++;
+    }
+    if (_isDoji(lastCandle) && _isDowntrend(recent)) {
+      score += 0.8;
+      patterns++;
+    }
+
     // Bearish patterns
-    if (_isBearishEngulfing(prevCandle, lastCandle)) { score -= 1.5; patterns++; }
-    if (_isShootingStar(lastCandle)) { score -= 1.2; patterns++; }
-    if (_isEveningStar(recent)) { score -= 1.8; patterns++; }
-    if (_isDoji(lastCandle) && _isUptrend(recent)) { score -= 0.8; patterns++; }
-    
+    if (_isBearishEngulfing(prevCandle, lastCandle)) {
+      score -= 1.5;
+      patterns++;
+    }
+    if (_isShootingStar(lastCandle)) {
+      score -= 1.2;
+      patterns++;
+    }
+    if (_isEveningStar(recent)) {
+      score -= 1.8;
+      patterns++;
+    }
+    if (_isDoji(lastCandle) && _isUptrend(recent)) {
+      score -= 0.8;
+      patterns++;
+    }
+
     // Chart patterns
-    if (_isDoubleBottom(candles)) { score += 2.0; patterns++; }
-    if (_isDoubleTop(candles)) { score -= 2.0; patterns++; }
-    if (_isBreakout(candles, currentPrice)) { score += 1.5; patterns++; }
-    if (_isBreakdown(candles, currentPrice)) { score -= 1.5; patterns++; }
-    
+    if (_isDoubleBottom(candles)) {
+      score += 2.0;
+      patterns++;
+    }
+    if (_isDoubleTop(candles)) {
+      score -= 2.0;
+      patterns++;
+    }
+    if (_isBreakout(candles, currentPrice)) {
+      score += 1.5;
+      patterns++;
+    }
+    if (_isBreakdown(candles, currentPrice)) {
+      score -= 1.5;
+      patterns++;
+    }
+
     final normalizedScore = patterns > 0 ? score / patterns : 0.0;
-    final direction = normalizedScore > 0.3 ? 'BULLISH' 
-                    : normalizedScore < -0.3 ? 'BEARISH' 
-                    : 'NEUTRAL';
-    
+    final direction = normalizedScore > 0.3
+        ? 'BULLISH'
+        : normalizedScore < -0.3
+            ? 'BEARISH'
+            : 'NEUTRAL';
+
     return _ModelPrediction(
       direction: direction,
       score: normalizedScore.clamp(-1.0, 1.0),
@@ -290,10 +425,10 @@ class GoldAIEngine {
     // Calculate volatility regime
     final volatility = f.atr / f.currentPrice * 100;
     final bollingerPercent = f.bollingerWidth / f.currentPrice * 100;
-    
+
     String regime;
     double riskMultiplier;
-    
+
     if (volatility > 2.0 || bollingerPercent > 4.0) {
       regime = 'HIGH';
       riskMultiplier = 0.5; // Reduce position size
@@ -304,7 +439,7 @@ class GoldAIEngine {
       regime = 'LOW';
       riskMultiplier = 1.2; // Can increase position slightly
     }
-    
+
     return _VolatilityPrediction(
       volatility: volatility,
       regime: regime,
@@ -324,30 +459,35 @@ class GoldAIEngine {
   }) {
     // Weighted average of scores
     final totalWeight = _trendWeight + _momentumWeight + _patternWeight;
-    
-    final weightedScore = (
-      trend.score * _trendWeight +
-      momentum.score * _momentumWeight +
-      pattern.score * _patternWeight
-    ) / totalWeight;
-    
+
+    final weightedScore = (trend.score * _trendWeight +
+            momentum.score * _momentumWeight +
+            pattern.score * _patternWeight) /
+        totalWeight;
+
     // Adjust for news and sentiment
     final newsAdjustment = (newsImpact - 0.5) * 0.3;
     final sentimentAdjustment = (sentiment - 0.5) * 0.2;
-    
-    final finalScore = (weightedScore + newsAdjustment + sentimentAdjustment).clamp(-1.0, 1.0);
-    
+
+    final finalScore =
+        (weightedScore + newsAdjustment + sentimentAdjustment).clamp(-1.0, 1.0);
+
     // Determine direction
     String direction;
-    if (finalScore > 0.4) direction = 'STRONG_BULLISH';
-    else if (finalScore > 0.15) direction = 'BULLISH';
-    else if (finalScore < -0.4) direction = 'STRONG_BEARISH';
-    else if (finalScore < -0.15) direction = 'BEARISH';
-    else direction = 'NEUTRAL';
-    
+    if (finalScore > 0.4)
+      direction = 'STRONG_BULLISH';
+    else if (finalScore > 0.15)
+      direction = 'BULLISH';
+    else if (finalScore < -0.4)
+      direction = 'STRONG_BEARISH';
+    else if (finalScore < -0.15)
+      direction = 'BEARISH';
+    else
+      direction = 'NEUTRAL';
+
     // Calculate strength
     final strength = finalScore.abs();
-    
+
     // Create trend analysis
     final trendAnalysis = AITrendAnalysis(
       type: _getTrendType(direction),
@@ -356,7 +496,7 @@ class GoldAIEngine {
       trendText: _getTrendText(direction),
       change: finalScore * 100,
     );
-    
+
     return _EnsembleResult(
       direction: direction,
       strength: strength,
@@ -373,40 +513,49 @@ class GoldAIEngine {
     required double volatility,
   }) {
     final predictions = <AIPricePoint>[];
-    
+
     // Determine trend factor
     double trendFactor;
     switch (direction) {
-      case 'STRONG_BULLISH': trendFactor = 0.003; break;
-      case 'BULLISH': trendFactor = 0.0015; break;
-      case 'STRONG_BEARISH': trendFactor = -0.003; break;
-      case 'BEARISH': trendFactor = -0.0015; break;
-      default: trendFactor = 0.0;
+      case 'STRONG_BULLISH':
+        trendFactor = 0.003;
+        break;
+      case 'BULLISH':
+        trendFactor = 0.0015;
+        break;
+      case 'STRONG_BEARISH':
+        trendFactor = -0.003;
+        break;
+      case 'BEARISH':
+        trendFactor = -0.0015;
+        break;
+      default:
+        trendFactor = 0.0;
     }
-    
+
     // Apply strength multiplier
     trendFactor *= strength;
-    
+
     // Generate 24-hour predictions
     var price = currentPrice;
     final random = math.Random(DateTime.now().millisecondsSinceEpoch);
-    
+
     for (int i = 1; i <= 24; i++) {
       // Trend component
       final trend = price * trendFactor;
-      
+
       // Volatility component (random noise)
       final noise = (random.nextDouble() - 0.5) * volatility * price * 0.001;
-      
+
       // Mean reversion component
       final reversion = (currentPrice - price) * 0.02;
-      
+
       // Update price
       price += trend + noise + reversion;
-      
+
       // Calculate bounds
       final range = volatility * price * 0.005 * math.sqrt(i.toDouble());
-      
+
       predictions.add(AIPricePoint(
         timestamp: DateTime.now().add(Duration(hours: i)),
         price: price,
@@ -415,7 +564,7 @@ class GoldAIEngine {
         hourOffset: i,
       ));
     }
-    
+
     return predictions;
   }
 
@@ -427,29 +576,28 @@ class GoldAIEngine {
   }) {
     // 1. Model Agreement
     final modelAgreement = _modelAccuracy;
-    
+
     // 2. Trend Strength (ADX)
     final trendStrength = (features.adx / 100.0).clamp(0.0, 1.0);
-    
+
     // 3. Data Quality
     final dataQuality = candles.length >= 200 ? 0.9 : candles.length / 200.0;
-    
+
     // 4. Volatility Confidence (lower volatility = higher confidence)
     final volNormalized = (features.atr / features.currentPrice * 100);
     final volatilityConfidence = (1.0 - volNormalized / 5.0).clamp(0.3, 0.9);
-    
+
     // 5. Signal Clarity
     final signalClarity = ensembleResult.strength;
-    
+
     // Weighted overall
-    final overall = (
-      modelAgreement * 0.25 +
-      trendStrength * 0.20 +
-      dataQuality * 0.15 +
-      volatilityConfidence * 0.20 +
-      signalClarity * 0.20
-    ).clamp(0.40, 0.92);
-    
+    final overall = (modelAgreement * 0.25 +
+            trendStrength * 0.20 +
+            dataQuality * 0.15 +
+            volatilityConfidence * 0.20 +
+            signalClarity * 0.20)
+        .clamp(0.40, 0.92);
+
     return AIConfidence(
       overall: overall,
       modelAccuracy: modelAgreement,
@@ -470,24 +618,27 @@ class GoldAIEngine {
     required _FeatureSet features,
   }) {
     final recommendations = <AIRecommendation>[];
-    
+
     // Always generate a recommendation (no more HOLD-only)
-    final avgPredicted = predictions.map((p) => p.price).reduce((a, b) => a + b) / predictions.length;
+    final avgPredicted =
+        predictions.map((p) => p.price).reduce((a, b) => a + b) /
+            predictions.length;
     final expectedChange = ((avgPredicted - currentPrice) / currentPrice) * 100;
-    
+
     // Primary recommendation based on direction
     AITradeAction action;
     String reason;
     double entryPrice = currentPrice;
     double targetPrice;
     double stopLoss;
-    
+
     switch (direction) {
       case 'STRONG_BULLISH':
         action = AITradeAction.strongBuy;
         targetPrice = currentPrice * 1.025; // 2.5% target
         stopLoss = currentPrice * 0.988; // 1.2% stop
-        reason = '📈 إشارة شراء قوية جداً! الاتجاه صعودي + زخم قوي + أنماط إيجابية';
+        reason =
+            '📈 إشارة شراء قوية جداً! الاتجاه صعودي + زخم قوي + أنماط إيجابية';
         break;
       case 'BULLISH':
         action = AITradeAction.buy;
@@ -499,7 +650,8 @@ class GoldAIEngine {
         action = AITradeAction.strongSell;
         targetPrice = currentPrice * 0.975; // 2.5% target
         stopLoss = currentPrice * 1.012; // 1.2% stop
-        reason = '📉 إشارة بيع قوية جداً! الاتجاه هبوطي + زخم سلبي + أنماط سلبية';
+        reason =
+            '📉 إشارة بيع قوية جداً! الاتجاه هبوطي + زخم سلبي + أنماط سلبية';
         break;
       case 'BEARISH':
         action = AITradeAction.sell;
@@ -526,9 +678,9 @@ class GoldAIEngine {
           reason = '⏸️ السوق متذبذب - انتظر إشارة أوضح';
         }
     }
-    
+
     final riskReward = _calculateRiskReward(entryPrice, targetPrice, stopLoss);
-    
+
     recommendations.add(AIRecommendation(
       action: action,
       confidence: confidence.overall,
@@ -540,17 +692,17 @@ class GoldAIEngine {
       reason: reason,
       indicators: _summarizeIndicators(features),
     ));
-    
+
     // Add RSI-based recommendation if extreme
     if (features.rsi > 75 || features.rsi < 25) {
       recommendations.add(_generateRSIRecommendation(features, currentPrice));
     }
-    
+
     // Add support/resistance based recommendation
     if (features.pricePosition < 0.1 || features.pricePosition > 0.9) {
       recommendations.add(_generateLevelRecommendation(features, currentPrice));
     }
-    
+
     return recommendations;
   }
 
@@ -564,7 +716,8 @@ class GoldAIEngine {
         stopLoss: price * 1.008,
         riskRewardRatio: 1.87,
         timeframe: 'قصير جداً (1-4 ساعات)',
-        reason: '⚠️ RSI = ${f.rsi.toStringAsFixed(1)} - منطقة تشبع شرائي! فرصة بيع',
+        reason:
+            '⚠️ RSI = ${f.rsi.toStringAsFixed(1)} - منطقة تشبع شرائي! فرصة بيع',
         indicators: {'RSI': f.rsi},
       );
     } else {
@@ -576,7 +729,8 @@ class GoldAIEngine {
         stopLoss: price * 0.992,
         riskRewardRatio: 1.87,
         timeframe: 'قصير جداً (1-4 ساعات)',
-        reason: '⚠️ RSI = ${f.rsi.toStringAsFixed(1)} - منطقة تشبع بيعي! فرصة شراء',
+        reason:
+            '⚠️ RSI = ${f.rsi.toStringAsFixed(1)} - منطقة تشبع بيعي! فرصة شراء',
         indicators: {'RSI': f.rsi},
       );
     }
@@ -618,25 +772,25 @@ class GoldAIEngine {
   ) {
     final support = <AIPriceLevel>[];
     final resistance = <AIPriceLevel>[];
-    
+
     // Find swing highs and lows
     final swingHighs = <double>[];
     final swingLows = <double>[];
-    
+
     for (int i = 5; i < candles.length - 5; i++) {
       if (_isSwingHigh(candles, i)) swingHighs.add(candles[i].high);
       if (_isSwingLow(candles, i)) swingLows.add(candles[i].low);
     }
-    
+
     // Cluster levels
     final resistanceLevels = _clusterLevels(swingHighs, currentPrice, true);
     final supportLevels = _clusterLevels(swingLows, currentPrice, false);
-    
+
     // Add Fibonacci levels
     final recentHigh = candles.map((c) => c.high).reduce(math.max);
     final recentLow = candles.map((c) => c.low).reduce(math.min);
     final range = recentHigh - recentLow;
-    
+
     final fibLevels = [0.236, 0.382, 0.5, 0.618, 0.786];
     for (final fib in fibLevels) {
       final level = recentLow + range * fib;
@@ -656,7 +810,7 @@ class GoldAIEngine {
         ));
       }
     }
-    
+
     // Add clustered levels
     for (final level in resistanceLevels) {
       resistance.add(level);
@@ -664,11 +818,11 @@ class GoldAIEngine {
     for (final level in supportLevels) {
       support.add(level);
     }
-    
+
     // Sort
     support.sort((a, b) => b.price.compareTo(a.price));
     resistance.sort((a, b) => a.price.compareTo(b.price));
-    
+
     return _SmartLevels(
       support: support.take(5).toList(),
       resistance: resistance.take(5).toList(),
@@ -697,19 +851,21 @@ class GoldAIEngine {
 
   double _calculateRSI(List<double> closes, int period) {
     if (closes.length < period + 1) return 50.0;
-    
+
     double avgGain = 0;
     double avgLoss = 0;
-    
+
     for (int i = closes.length - period; i < closes.length; i++) {
       final change = closes[i] - closes[i - 1];
-      if (change > 0) avgGain += change;
-      else avgLoss += change.abs();
+      if (change > 0)
+        avgGain += change;
+      else
+        avgLoss += change.abs();
     }
-    
+
     avgGain /= period;
     avgLoss /= period;
-    
+
     if (avgLoss == 0) return 100.0;
     final rs = avgGain / avgLoss;
     return 100.0 - (100.0 / (1.0 + rs));
@@ -739,14 +895,14 @@ class GoldAIEngine {
     int period,
   ) {
     if (closes.length < period) return 50.0;
-    
+
     final recentHighs = highs.sublist(highs.length - period);
     final recentLows = lows.sublist(lows.length - period);
-    
+
     final highest = recentHighs.reduce(math.max);
     final lowest = recentLows.reduce(math.min);
     final current = closes.last;
-    
+
     if (highest == lowest) return 50.0;
     return ((current - lowest) / (highest - lowest)) * 100;
   }
@@ -758,7 +914,7 @@ class GoldAIEngine {
     int period,
   ) {
     if (closes.length < period + 1) return 10.0;
-    
+
     final trValues = <double>[];
     for (int i = 1; i < closes.length; i++) {
       final tr = [
@@ -768,7 +924,7 @@ class GoldAIEngine {
       ].reduce(math.max);
       trValues.add(tr);
     }
-    
+
     return _calculateSMA(trValues, period);
   }
 
@@ -779,14 +935,14 @@ class GoldAIEngine {
     int period,
   ) {
     if (closes.length < period * 2) return 25.0;
-    
+
     // Simplified ADX calculation
     final plusDI = _calculatePlusDI(highs, lows, closes, period);
     final minusDI = _calculateMinusDI(highs, lows, closes, period);
-    
+
     final diSum = plusDI + minusDI;
     if (diSum == 0) return 25.0;
-    
+
     final dx = ((plusDI - minusDI).abs() / diSum) * 100;
     return dx;
   }
@@ -798,14 +954,14 @@ class GoldAIEngine {
     int period,
   ) {
     if (highs.length < period + 1) return 50.0;
-    
+
     double sumPlusDM = 0;
     for (int i = highs.length - period; i < highs.length; i++) {
       final plusDM = highs[i] - highs[i - 1];
       final minusDM = lows[i - 1] - lows[i];
       if (plusDM > minusDM && plusDM > 0) sumPlusDM += plusDM;
     }
-    
+
     final atr = _calculateATR(highs, lows, closes, period);
     return atr == 0 ? 50.0 : (sumPlusDM / period) / atr * 100;
   }
@@ -817,14 +973,14 @@ class GoldAIEngine {
     int period,
   ) {
     if (lows.length < period + 1) return 50.0;
-    
+
     double sumMinusDM = 0;
     for (int i = lows.length - period; i < lows.length; i++) {
       final plusDM = highs[i] - highs[i - 1];
       final minusDM = lows[i - 1] - lows[i];
       if (minusDM > plusDM && minusDM > 0) sumMinusDM += minusDM;
     }
-    
+
     final atr = _calculateATR(highs, lows, closes, period);
     return atr == 0 ? 50.0 : (sumMinusDM / period) / atr * 100;
   }
@@ -842,22 +998,25 @@ class GoldAIEngine {
   }
 
   double _calculateBollingerWidth(List<double> closes, int period) {
-    return _calculateBollingerUpper(closes, period) - 
-           _calculateBollingerLower(closes, period);
+    return _calculateBollingerUpper(closes, period) -
+        _calculateBollingerLower(closes, period);
   }
 
   double _calculateStdDev(List<double> data, int period) {
     if (data.length < period) return 0.0;
     final subset = data.sublist(data.length - period);
     final mean = subset.reduce((a, b) => a + b) / period;
-    final variance = subset.map((x) => math.pow(x - mean, 2)).reduce((a, b) => a + b) / period;
+    final variance =
+        subset.map((x) => math.pow(x - mean, 2)).reduce((a, b) => a + b) /
+            period;
     return math.sqrt(variance);
   }
 
   double _calculateOBV(List<double> closes, List<double> volumes) {
     double obv = 0;
     for (int i = 1; i < closes.length; i++) {
-      if (closes[i] > closes[i - 1]) obv += volumes[i];
+      if (closes[i] > closes[i - 1])
+        obv += volumes[i];
       else if (closes[i] < closes[i - 1]) obv -= volumes[i];
     }
     return obv;
@@ -882,7 +1041,8 @@ class GoldAIEngine {
     return ((closes.last - prev) / prev) * 100;
   }
 
-  double _calculatePricePosition(double current, List<double> highs, List<double> lows) {
+  double _calculatePricePosition(
+      double current, List<double> highs, List<double> lows) {
     final highest = highs.reduce(math.max);
     final lowest = lows.reduce(math.min);
     if (highest == lowest) return 0.5;
@@ -892,14 +1052,16 @@ class GoldAIEngine {
   double _calculateMomentumConfidence(_FeatureSet f) {
     // Higher confidence when indicators agree
     int agreements = 0;
-    
+
     // RSI agreement
     if ((f.rsi > 50 && f.macd > 0) || (f.rsi < 50 && f.macd < 0)) agreements++;
     // MACD agreement
-    if ((f.macd > f.macdSignal && f.rsi > 50) || (f.macd < f.macdSignal && f.rsi < 50)) agreements++;
+    if ((f.macd > f.macdSignal && f.rsi > 50) ||
+        (f.macd < f.macdSignal && f.rsi < 50)) agreements++;
     // Stochastic agreement
-    if ((f.stochastic > 50 && f.momentum > 0) || (f.stochastic < 50 && f.momentum < 0)) agreements++;
-    
+    if ((f.stochastic > 50 && f.momentum > 0) ||
+        (f.stochastic < 50 && f.momentum < 0)) agreements++;
+
     return 0.5 + (agreements * 0.15);
   }
 
@@ -909,16 +1071,16 @@ class GoldAIEngine {
 
   bool _isBullishEngulfing(Candle prev, Candle curr) {
     return prev.close < prev.open && // Previous is bearish
-           curr.close > curr.open && // Current is bullish
-           curr.open < prev.close && // Opens below prev close
-           curr.close > prev.open;   // Closes above prev open
+        curr.close > curr.open && // Current is bullish
+        curr.open < prev.close && // Opens below prev close
+        curr.close > prev.open; // Closes above prev open
   }
 
   bool _isBearishEngulfing(Candle prev, Candle curr) {
     return prev.close > prev.open && // Previous is bullish
-           curr.close < curr.open && // Current is bearish
-           curr.open > prev.close && // Opens above prev close
-           curr.close < prev.open;   // Closes below prev open
+        curr.close < curr.open && // Current is bearish
+        curr.open > prev.close && // Opens above prev close
+        curr.close < prev.open; // Closes below prev open
   }
 
   bool _isHammer(Candle c) {
@@ -946,11 +1108,12 @@ class GoldAIEngine {
     final c1 = candles[candles.length - 3];
     final c2 = candles[candles.length - 2];
     final c3 = candles.last;
-    
+
     return c1.close < c1.open && // First is bearish
-           (c2.close - c2.open).abs() < (c1.close - c1.open).abs() * 0.3 && // Second is small
-           c3.close > c3.open && // Third is bullish
-           c3.close > (c1.open + c1.close) / 2; // Third closes above mid of first
+        (c2.close - c2.open).abs() <
+            (c1.close - c1.open).abs() * 0.3 && // Second is small
+        c3.close > c3.open && // Third is bullish
+        c3.close > (c1.open + c1.close) / 2; // Third closes above mid of first
   }
 
   bool _isEveningStar(List<Candle> candles) {
@@ -958,11 +1121,12 @@ class GoldAIEngine {
     final c1 = candles[candles.length - 3];
     final c2 = candles[candles.length - 2];
     final c3 = candles.last;
-    
+
     return c1.close > c1.open && // First is bullish
-           (c2.close - c2.open).abs() < (c1.close - c1.open).abs() * 0.3 && // Second is small
-           c3.close < c3.open && // Third is bearish
-           c3.close < (c1.open + c1.close) / 2; // Third closes below mid of first
+        (c2.close - c2.open).abs() <
+            (c1.close - c1.open).abs() * 0.3 && // Second is small
+        c3.close < c3.open && // Third is bearish
+        c3.close < (c1.open + c1.close) / 2; // Third closes below mid of first
   }
 
   bool _isDowntrend(List<Candle> candles) {
@@ -978,10 +1142,10 @@ class GoldAIEngine {
   bool _isDoubleBottom(List<Candle> candles) {
     // Simplified double bottom detection
     if (candles.length < 50) return false;
-    
+
     final lows = candles.map((c) => c.low).toList();
     final recent = lows.sublist(lows.length - 50);
-    
+
     // Find two similar lows
     final minLow = recent.reduce(math.min);
     int count = 0;
@@ -993,10 +1157,10 @@ class GoldAIEngine {
 
   bool _isDoubleTop(List<Candle> candles) {
     if (candles.length < 50) return false;
-    
+
     final highs = candles.map((c) => c.high).toList();
     final recent = highs.sublist(highs.length - 50);
-    
+
     final maxHigh = recent.reduce(math.max);
     int count = 0;
     for (final high in recent) {
@@ -1023,27 +1187,28 @@ class GoldAIEngine {
     if (index < 2 || index >= candles.length - 2) return false;
     final high = candles[index].high;
     return high > candles[index - 1].high &&
-           high > candles[index - 2].high &&
-           high > candles[index + 1].high &&
-           high > candles[index + 2].high;
+        high > candles[index - 2].high &&
+        high > candles[index + 1].high &&
+        high > candles[index + 2].high;
   }
 
   bool _isSwingLow(List<Candle> candles, int index) {
     if (index < 2 || index >= candles.length - 2) return false;
     final low = candles[index].low;
     return low < candles[index - 1].low &&
-           low < candles[index - 2].low &&
-           low < candles[index + 1].low &&
-           low < candles[index + 2].low;
+        low < candles[index - 2].low &&
+        low < candles[index + 1].low &&
+        low < candles[index + 2].low;
   }
 
-  List<AIPriceLevel> _clusterLevels(List<double> levels, double currentPrice, bool isResistance) {
+  List<AIPriceLevel> _clusterLevels(
+      List<double> levels, double currentPrice, bool isResistance) {
     if (levels.isEmpty) return [];
-    
+
     levels.sort();
     final clusters = <List<double>>[];
     var currentCluster = <double>[levels.first];
-    
+
     for (int i = 1; i < levels.length; i++) {
       if ((levels[i] - currentCluster.last) / currentCluster.last < 0.005) {
         currentCluster.add(levels[i]);
@@ -1053,11 +1218,12 @@ class GoldAIEngine {
       }
     }
     clusters.add(currentCluster);
-    
+
     final result = <AIPriceLevel>[];
     for (final cluster in clusters) {
       final avgPrice = cluster.reduce((a, b) => a + b) / cluster.length;
-      if (isResistance && avgPrice > currentPrice || !isResistance && avgPrice < currentPrice) {
+      if (isResistance && avgPrice > currentPrice ||
+          !isResistance && avgPrice < currentPrice) {
         result.add(AIPriceLevel(
           price: avgPrice,
           label: isResistance ? 'مقاومة' : 'دعم',
@@ -1066,7 +1232,7 @@ class GoldAIEngine {
         ));
       }
     }
-    
+
     return result;
   }
 
@@ -1082,21 +1248,31 @@ class GoldAIEngine {
 
   AITrendType _getTrendType(String direction) {
     switch (direction) {
-      case 'STRONG_BULLISH': return AITrendType.strongBullish;
-      case 'BULLISH': return AITrendType.bullish;
-      case 'STRONG_BEARISH': return AITrendType.strongBearish;
-      case 'BEARISH': return AITrendType.bearish;
-      default: return AITrendType.neutral;
+      case 'STRONG_BULLISH':
+        return AITrendType.strongBullish;
+      case 'BULLISH':
+        return AITrendType.bullish;
+      case 'STRONG_BEARISH':
+        return AITrendType.strongBearish;
+      case 'BEARISH':
+        return AITrendType.bearish;
+      default:
+        return AITrendType.neutral;
     }
   }
 
   String _getTrendText(String direction) {
     switch (direction) {
-      case 'STRONG_BULLISH': return 'صعودي قوي جداً 🚀';
-      case 'BULLISH': return 'صعودي 📈';
-      case 'STRONG_BEARISH': return 'هبوطي قوي جداً 📉';
-      case 'BEARISH': return 'هبوطي ↘️';
-      default: return 'عرضي/محايد ↔️';
+      case 'STRONG_BULLISH':
+        return 'صعودي قوي جداً 🚀';
+      case 'BULLISH':
+        return 'صعودي 📈';
+      case 'STRONG_BEARISH':
+        return 'هبوطي قوي جداً 📉';
+      case 'BEARISH':
+        return 'هبوطي ↘️';
+      default:
+        return 'عرضي/محايد ↔️';
     }
   }
 
@@ -1317,11 +1493,16 @@ class AIRecommendation {
 
   String get actionText {
     switch (action) {
-      case AITradeAction.strongBuy: return '🟢 شراء قوي';
-      case AITradeAction.buy: return '🟢 شراء';
-      case AITradeAction.hold: return '⏸️ انتظار';
-      case AITradeAction.sell: return '🔴 بيع';
-      case AITradeAction.strongSell: return '🔴 بيع قوي';
+      case AITradeAction.strongBuy:
+        return '🟢 شراء قوي';
+      case AITradeAction.buy:
+        return '🟢 شراء';
+      case AITradeAction.hold:
+        return '⏸️ انتظار';
+      case AITradeAction.sell:
+        return '🔴 بيع';
+      case AITradeAction.strongSell:
+        return '🔴 بيع قوي';
     }
   }
 }
@@ -1357,5 +1538,5 @@ class AITrendAnalysis {
 }
 
 enum AITradeAction { strongBuy, buy, hold, sell, strongSell }
-enum AITrendType { strongBullish, bullish, neutral, bearish, strongBearish }
 
+enum AITrendType { strongBullish, bullish, neutral, bearish, strongBearish }

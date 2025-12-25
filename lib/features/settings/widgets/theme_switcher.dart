@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/royal_colors.dart';
 import '../../../core/theme/app_typography.dart';
 import '../providers/settings_provider.dart';
 
@@ -36,7 +35,7 @@ class ThemeSwitcher extends ConsumerWidget {
             'royal',
             'المظهر الملكي',
             Icons.auto_awesome_outlined,
-            RoyalColors.royalGradient,
+            AppColors.royalGradient,
             currentTheme == 'royal',
           ),
         ),
@@ -72,10 +71,7 @@ class ThemeSwitcher extends ConsumerWidget {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: (themeCode == 'royal'
-                            ? RoyalColors.royalGold
-                            : AppColors.royalGold)
-                        .withValues(alpha: 0.3),
+                    color: AppColors.royalGold.withValues(alpha: 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
